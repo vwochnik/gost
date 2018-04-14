@@ -8,6 +8,7 @@ import (
 	"runtime"
 
 	"github.com/vwochnik/gost/fileserver"
+	"github.com/vwochnik/gost/template"
 )
 
 const Version = "0.1.2"
@@ -34,6 +35,18 @@ func init() {
 
 func main() {
 	listen := fmt.Sprintf("%s:%d", args.host, args.port)
+
+	fileserver.NotFoundHandler = func(w http.ResponseWriter, r *http.Request) {
+		template.ErrorTemplate(w, "File Not Found", 404)
+	}
+
+	fileserver.ErrorHandler = func(w http.ResponseWriter, r *http.Request, msg string, code int) {
+		template.ErrorTemplate(w, msg, code)
+	}
+
+	fileserver.DirListHandler = func(w http.ResponseWriter, f http.File) {
+		template.DirectoryTemplate(w, f)
+	}
 
 	http.Handle("/", fileserver.FileServer(http.Dir(args.directory)))
 	handler := buildHttpHandler()
