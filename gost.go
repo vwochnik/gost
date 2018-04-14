@@ -37,14 +37,19 @@ func main() {
 	listen := fmt.Sprintf("%s:%d", args.host, args.port)
 
 	fileserver.NotFoundHandler = func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		w.WriteHeader(404)
 		template.ErrorTemplate(w, "File Not Found", 404)
 	}
 
 	fileserver.ErrorHandler = func(w http.ResponseWriter, r *http.Request, msg string, code int) {
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		w.WriteHeader(code)
 		template.ErrorTemplate(w, msg, code)
 	}
 
 	fileserver.DirListHandler = func(w http.ResponseWriter, f http.File) {
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		template.DirectoryTemplate(w, f)
 	}
 
